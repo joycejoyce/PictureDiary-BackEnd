@@ -18,7 +18,9 @@ from linebot.models import *
 import FileNameGetter
 
 def main():
-    fileName = FileNameGetter.get()
+    fileExtension = "txt"
+    fileName = FileNameGetter.get(fileExtension)
+    print("got fileName: " + fileName)
     # port = int(os.environ.get('PORT', 80))
     # app.run(host='0.0.0.0', port=port)
 
