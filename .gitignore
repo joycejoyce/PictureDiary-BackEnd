@@ -1,4 +1,6 @@
 *.txt
+*.mp4
+*.jpg
 *.bak
 __pycache__
 test*

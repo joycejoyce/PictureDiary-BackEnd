@@ -7,8 +7,8 @@ def get(fileExtension):
     currentDateStr = getCurrentDateStr()
     folderPath = getFolderPath(currentDateStr)
     maxFileNo = getMaxFileNo(folderPath, currentDateStr)
-    fileName = getFileName(folderPath, currentDateStr, maxFileNo, fileExtension)
-    return fileName
+    filePath = getFilePath(folderPath, currentDateStr, maxFileNo, fileExtension)
+    return filePath
 
 def getCurrentDateStr():
     today = date.today().strftime("%Y%m%d")
@@ -24,11 +24,11 @@ def getFolderPath(currentDateStr):
         print ("Creation of the directory '%s' failed" % folderPath)
 
 def getMaxFileNo(folderPath, currentDateStr):
-    allFileNames = [f for f in listdir(folderPath) if isfile(join(folderPath, f)) and isFileNameMatched(currentDateStr, f)]
-    for f in allFileNames:
-        print ("matched fileName:" + f)
+    allfilePaths = [f for f in listdir(folderPath) if isfile(join(folderPath, f)) and isfilePathMatched(currentDateStr, f)]
+    for f in allfilePaths:
+        print ("matched filePath:" + f)
 
-    allNo = getAllNo(allFileNames)
+    allNo = getAllNo(allfilePaths)
     if len(allNo) > 0:
         maxNo = int(allNo[-1])
     else:
@@ -36,19 +36,19 @@ def getMaxFileNo(folderPath, currentDateStr):
 
     return maxNo
 
-def isFileNameMatched(prefix, fileName):
+def isfilePathMatched(prefix, filePath):
     pattern = re.compile(prefix + "_.+")
-    isMatched = pattern.match(fileName)
+    isMatched = pattern.match(filePath)
     if isMatched:
-        print ("'%s' matched" % fileName)
+        print ("'%s' matched" % filePath)
         return True
     else:
-        print ("'%s' not matched" % fileName)
+        print ("'%s' not matched" % filePath)
         return False
 
-def getAllNo(allFileNames):
+def getAllNo(allfilePaths):
     nums = []
-    for f in allFileNames:
+    for f in allfilePaths:
         matchObj = re.search(r"_\d{2}\.", f)
         if matchObj:
             startPos = matchObj.span()[0] + 1
@@ -58,6 +58,6 @@ def getAllNo(allFileNames):
     nums = sorted(nums)
     return nums
 
-def getFileName(folderPath, currentDateStr, maxFileNo, fileExtension):
-    paddingZero = format(maxFileNo, '02')
+def getFilePath(folderPath, currentDateStr, maxFileNo, fileExtension):
+    paddingZero = format(maxFileNo+1, '02')
     return folderPath + "/" + currentDateStr + "_" + paddingZero + "." + fileExtension

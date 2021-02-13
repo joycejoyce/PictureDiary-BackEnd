@@ -15,16 +15,14 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import *
-import FileNameGetter
-
-def main():
-    fileExtension = "txt"
-    fileName = FileNameGetter.get(fileExtension)
-    print("got fileName: " + fileName)
-    # port = int(os.environ.get('PORT', 80))
-    # app.run(host='0.0.0.0', port=port)
+import FilePathGetter
+import FileSaver
 
 app = Flask(__name__)
+def main():
+    port = int(os.environ.get('PORT', 80))
+    app.run(host='0.0.0.0', port=port)
+
 @app.route("/callback", methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']
@@ -37,26 +35,11 @@ def callback():
         abort(400)
     return 'OK'
 
-line_bot_api = LineBotApi('dzuf4ok7JghxVZh1Ua+V2vYDUmGnQXW/L5v5yivAzCNae2STLMjhonxgdt/rDh6DKgtPuc/yRFVfzgqrcZPJc3vCQxoQC8TzQWBX0mBdtixudw50CiM7k4kJaYcMq442zV6Sx/WE+cjbzoD0hreLcwdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('2e7ee14868554f9804bc8ef5b0073a41')
 @handler.add(MessageEvent)
 def handle_message(event):
-    message_type = event.message.type
-
-    if message_type == "text":
-        message_text = event.message.text
-        # reply_token = event.reply_token
-        # line_bot_api.reply_message(reply_token, TextSendMessage(text = message_text))
-    elif message_type == "image":
-        message_content = line_bot_api.get_message_content(event.message.id)
-        with open("test.jpg", 'wb') as fd:
-            for chunk in message_content.iter_content():
-                fd.write(chunk)
-    elif message_type == "video":
-        message_content = line_bot_api.get_message_content(event.message.id)
-        with open("test.mp4", 'wb') as fd:
-            for chunk in message_content.iter_content():
-                fd.write(chunk)
+    print("got event")
+    FileSaver.save(event.message)
 
 def saveContents(fileName, mimeType):
     creds = getCreds()
@@ -77,8 +60,7 @@ def getCreds():
             creds.refresh(Request())
         else:
             SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly', 'https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/drive.appdata']
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'client_secret.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
