@@ -22,11 +22,20 @@ def getFolderPath(currentDateStr):
         return folderPath
     except OSError:
         print ("Creation of the directory '%s' failed" % folderPath)
-
+# maxNo = 0
+#     try:
+#         fileNoFile = "FileNo.txt"
+#         if not path.exists():
+#             fd = open(fileNoFile, "a")
+#             fd.write("0\n")
+#             fd.close()
+#         else:
+#             lastLineText = getLastLineTextInFile(fileNoFile)
+#             maxNo = 
 def getMaxFileNo(folderPath, currentDateStr):
     allfilePaths = [f for f in listdir(folderPath) if isfile(join(folderPath, f)) and isfilePathMatched(currentDateStr, f)]
-    for f in allfilePaths:
-        print ("matched filePath:" + f)
+    # for f in allfilePaths:
+    #     print ("matched filePath:" + f)
 
     allNo = getAllNo(allfilePaths)
     if len(allNo) > 0:
@@ -40,10 +49,10 @@ def isfilePathMatched(prefix, filePath):
     pattern = re.compile(prefix + "_.+")
     isMatched = pattern.match(filePath)
     if isMatched:
-        print ("'%s' matched" % filePath)
+        # print ("'%s' matched" % filePath)
         return True
     else:
-        print ("'%s' not matched" % filePath)
+        # print ("'%s' not matched" % filePath)
         return False
 
 def getAllNo(allfilePaths):

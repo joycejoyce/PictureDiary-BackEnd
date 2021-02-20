@@ -1,12 +1,17 @@
 from linebot import LineBotApi
 import FilePathGetter
+import CloudFileSaver
 
-line_bot_api = LineBotApi('dzuf4ok7JghxVZh1Ua+V2vYDUmGnQXW/L5v5yivAzCNae2STLMjhonxgdt/rDh6DKgtPuc/yRFVfzgqrcZPJc3vCQxoQC8TzQWBX0mBdtixudw50CiM7k4kJaYcMq442zV6Sx/WE+cjbzoD0hreLcwdB04t89/1O/w1cDnyilFU=')
 def save(message):
     print("got message")
     msgType = message.type
-    filePath = getFilePath(msgType)
-
+    localFilePath = getFilePath(msgType)
+    saveToLocal(message, localFilePath, msgType)
+    saveToCloud(localFilePath)
+    
+line_bot_api = LineBotApi('dzuf4ok7JghxVZh1Ua+V2vYDUmGnQXW/L5v5yivAzCNae2STLMjhonxgdt/rDh6DKgtPuc/yRFVfzgqrcZPJc3vCQxoQC8TzQWBX0mBdtixudw50CiM7k4kJaYcMq442zV6Sx/WE+cjbzoD0hreLcwdB04t89/1O/w1cDnyilFU=')
+def saveToLocal(message, filePath, msgType):
+    print("saveToLocal(" + filePath + ")")
     if msgType == "text":
         message_text = message.text
         fd = open(filePath, "a")
@@ -21,7 +26,7 @@ def save(message):
         with open(filePath, 'wb') as fd:
             for chunk in message_content.iter_content():
                 fd.write(chunk)
-    print("write() " + filePath + " done")
+    print("saveToLocal [" + filePath + "] done")
 
 def getFilePath(msgType):
     if msgType == "text":
@@ -35,3 +40,7 @@ def getFilePath(msgType):
     print("filePath: " + filePath)
 
     return filePath
+
+def saveToCloud(localFilePath):
+    print("saveToCloud(" + localFilePath + ")")
+    CloudFileSaver.save(localFilePath)
