@@ -1,18 +1,41 @@
 from datetime import date
-from os import mkdir, listdir, path
-from os.path import isfile, join
-import re
+from os import mkdir, path
 
-def get(fileExtension):
+def get(message):
     currentDateStr = getCurrentDateStr()
+    fileName = getFileName(message, currentDateStr)
+    fileExtension = getFileExtension(message)
+    fullFileName = "%s.%s" % (fileName , fileExtension)
+
     folderPath = getFolderPath(currentDateStr)
-    maxFileNo = getMaxFileNo(folderPath, currentDateStr)
-    filePath = getFilePath(folderPath, currentDateStr, maxFileNo, fileExtension)
+
+    filePath = getFilePath(folderPath, fullFileName)
+
     return filePath
 
 def getCurrentDateStr():
     today = date.today().strftime("%Y%m%d")
     return today
+
+def getFileName(msg, currentDateStr):
+    fileName = "LINE_%s_%s" % (currentDateStr, msg.id)
+    # print("fileName: " + fileName)
+    return fileName
+
+def getFileExtension(message):
+    msgType = message.type
+
+    fileExtension = ""
+    if msgType == "text":
+        fileExtension = "txt"
+    elif msgType == "image":
+        fileExtension = "jpg"
+    elif msgType == "video":
+        fileExtension = "mp4"
+    else:
+        raise Exception("Unexpected msgType: [%s]" % msgType)
+
+    return fileExtension
 
 def getFolderPath(currentDateStr):
     try:
@@ -21,52 +44,9 @@ def getFolderPath(currentDateStr):
             mkdir(folderPath)
         return folderPath
     except OSError:
-        print ("Creation of the directory '%s' failed" % folderPath)
-# maxNo = 0
-#     try:
-#         fileNoFile = "FileNo.txt"
-#         if not path.exists():
-#             fd = open(fileNoFile, "a")
-#             fd.write("0\n")
-#             fd.close()
-#         else:
-#             lastLineText = getLastLineTextInFile(fileNoFile)
-#             maxNo = 
-def getMaxFileNo(folderPath, currentDateStr):
-    allfilePaths = [f for f in listdir(folderPath) if isfile(join(folderPath, f)) and isfilePathMatched(currentDateStr, f)]
-    # for f in allfilePaths:
-    #     print ("matched filePath:" + f)
+        print ("Create folder [%s] failed" % folderPath)
 
-    allNo = getAllNo(allfilePaths)
-    if len(allNo) > 0:
-        maxNo = int(allNo[-1])
-    else:
-        maxNo = 0
-
-    return maxNo
-
-def isfilePathMatched(prefix, filePath):
-    pattern = re.compile(prefix + "_.+")
-    isMatched = pattern.match(filePath)
-    if isMatched:
-        # print ("'%s' matched" % filePath)
-        return True
-    else:
-        # print ("'%s' not matched" % filePath)
-        return False
-
-def getAllNo(allfilePaths):
-    nums = []
-    for f in allfilePaths:
-        matchObj = re.search(r"_\d{2}\.", f)
-        if matchObj:
-            startPos = matchObj.span()[0] + 1
-            endPos = matchObj.span()[1] - 1
-            num = f[startPos : endPos]
-            nums.append(num)
-    nums = sorted(nums)
-    return nums
-
-def getFilePath(folderPath, currentDateStr, maxFileNo, fileExtension):
-    paddingZero = format(maxFileNo+1, '02')
-    return folderPath + "/" + currentDateStr + "_" + paddingZero + "." + fileExtension
+def getFilePath(folderPath, fullFileName):
+    filePath = folderPath + "/" + fullFileName
+    print("filePath: [%s]" % filePath)
+    return filePath

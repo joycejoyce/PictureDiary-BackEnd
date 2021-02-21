@@ -22,16 +22,15 @@ def getMimeType(localFilePath):
     elif fileExtension == "mp4":
         mimeType = "video/mp4"
     else:
-        raise Exception("Unexpeted fileExtension: " + fileExtension)
+        raise Exception("Unexpeted fileExtension: [%s]" % fileExtension)
 
-    print("mimeType: " + mimeType)
+    print("mimeType: [%s]" % mimeType)
 
     return mimeType
 
 def getFileExtension(localFilePath):
     fileName, fileExtension = os.path.splitext(localFilePath)
     fileExtension = fileExtension[1:]
-    print("fileExtension: " + fileExtension)
     return fileExtension
 
 def saveToCloud(localFilePath, mimeType):
@@ -42,7 +41,7 @@ def saveToCloud(localFilePath, mimeType):
 
 def getFileName(localFilePath):
     fileName = ntpath.basename(localFilePath)
-    print("fileName: " + fileName)
+    print("fileName: [%s]" % fileName)
     return fileName
 
 def getCreds():
@@ -80,6 +79,6 @@ def uploadFile(service, fileName, filePath, mimeType):
                             resumable=True)
     request = service.files().create(body=fileMetaData, media_body=media, fields='id').execute()
 
-    print ("File ID: " + request.get('id'))
-    print ("uploadFile(" + fileName + ") done")
+    print ("File ID: [%s]" % request.get("id"))
+    print ("uploadFile [%s] done" % fileName)
     

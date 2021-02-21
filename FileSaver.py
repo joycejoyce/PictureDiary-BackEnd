@@ -5,13 +5,12 @@ import CloudFileSaver
 def save(message):
     print("got message")
     msgType = message.type
-    localFilePath = getFilePath(msgType)
+    localFilePath = getFilePath(message)
     saveToLocal(message, localFilePath, msgType)
     saveToCloud(localFilePath)
     
 line_bot_api = LineBotApi('dzuf4ok7JghxVZh1Ua+V2vYDUmGnQXW/L5v5yivAzCNae2STLMjhonxgdt/rDh6DKgtPuc/yRFVfzgqrcZPJc3vCQxoQC8TzQWBX0mBdtixudw50CiM7k4kJaYcMq442zV6Sx/WE+cjbzoD0hreLcwdB04t89/1O/w1cDnyilFU=')
 def saveToLocal(message, filePath, msgType):
-    print("saveToLocal(" + filePath + ")")
     if msgType == "text":
         message_text = message.text
         fd = open(filePath, "a")
@@ -26,21 +25,12 @@ def saveToLocal(message, filePath, msgType):
         with open(filePath, 'wb') as fd:
             for chunk in message_content.iter_content():
                 fd.write(chunk)
-    print("saveToLocal [" + filePath + "] done")
+                
+    print("saveToLocal [%s] done" % filePath)
 
-def getFilePath(msgType):
-    if msgType == "text":
-        fileExtension = "txt"
-    elif msgType == "image":
-        fileExtension = "jpg"
-    elif msgType == "video":
-        fileExtension = "mp4"
-
-    filePath = FilePathGetter.get(fileExtension)
-    print("filePath: " + filePath)
-
+def getFilePath(message):
+    filePath = FilePathGetter.get(message)
     return filePath
 
 def saveToCloud(localFilePath):
-    print("saveToCloud(" + localFilePath + ")")
     CloudFileSaver.save(localFilePath)
