@@ -35,7 +35,6 @@ def callback():
 handler = WebhookHandler('2e7ee14868554f9804bc8ef5b0073a41')
 @handler.add(MessageEvent)
 def handle_message(event):
-    print("got event")
     FileSaver.save(event.message)
 
 if __name__ == '__main__':

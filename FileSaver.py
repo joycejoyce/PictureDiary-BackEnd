@@ -3,7 +3,6 @@ import FilePathGetter
 import CloudFileSaver
 
 def save(message):
-    print("got message")
     msgType = message.type
     localFilePath = getFilePath(message)
     saveToLocal(message, localFilePath, msgType)
