@@ -60,7 +60,7 @@ def runService(creds):
     return service
 
 def uploadFile(service, localFilePath, mimeType):
-    folderId_root = "1cqhxLGtfRJ9kRPbhP9gDE8alBMWL3gco" # "LineContent" folder ID
+    folderId_root = "19S4IWbrRUZRZe-laP1WQs1qPeaCP6iZ3" # "LineContent" folder ID
 
     folderName = FilePathProcessor.getFolderName(localFilePath)
     print("folderName: [%s]" % folderName)
