@@ -5,13 +5,14 @@ from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import ntpath
 import os
 import pickle
+import FilePathProcessor
 
 def save(localFilePath):
     mimeType = getMimeType(localFilePath)
     saveToCloud(localFilePath, mimeType)
 
 def getMimeType(localFilePath):
-    fileExtension = getFileExtension(localFilePath)
+    fileExtension = FilePathProcessor.getFileExtension(localFilePath)
 
     mimeType = ""
 
@@ -28,21 +29,10 @@ def getMimeType(localFilePath):
 
     return mimeType
 
-def getFileExtension(localFilePath):
-    fileName, fileExtension = os.path.splitext(localFilePath)
-    fileExtension = fileExtension[1:]
-    return fileExtension
-
 def saveToCloud(localFilePath, mimeType):
-    fileName = getFileName(localFilePath)
     creds = getCreds()
     service = runService(creds)
-    uploadFile(service, fileName, localFilePath, mimeType)
-
-def getFileName(localFilePath):
-    fileName = ntpath.basename(localFilePath)
-    print("fileName: [%s]" % fileName)
-    return fileName
+    uploadFile(service, localFilePath, mimeType)
 
 def getCreds():
     creds = None
@@ -69,16 +59,60 @@ def runService(creds):
     service = build('drive', 'v3', credentials=creds)
     return service
 
-def uploadFile(service, fileName, filePath, mimeType):
+def uploadFile(service, localFilePath, mimeType):
+    folderId_root = "1cqhxLGtfRJ9kRPbhP9gDE8alBMWL3gco" # "LineContent" folder ID
+
+    folderName = FilePathProcessor.getFolderName(localFilePath)
+    print("folderName: [%s]" % folderName)
+
+    folderId_Date = getFileId(service, folderName, folderId_root)
+    print("folderId_Date: [%s] (existed)" % folderId_Date)
+
+    if not folderId_Date:
+        folderId_Date = createFolder(service, folderName, folderId_root)        
+        print ("folderId_Date: [%s] (new-created)" % folderId_Date)
+
+    fileName = FilePathProcessor.getFileName(localFilePath)
+    print("fileName: [%s]" % fileName)
+
+    createFile(service, folderName, fileName, mimeType, folderId_Date)
+
+def getFileId(service, folderName, folderId_root):
+    queryStr = "mimeType='application/vnd.google-apps.folder' and name='%s' and parents in '%s'" % (folderName, folderId_root)
+    page_token = None
+    response = service.files().list(q=queryStr,
+                                    spaces='drive',
+                                    fields='nextPageToken, files(id, name)',
+                                    pageToken=page_token).execute()
+    files = response.get('files')
+    if len(files) > 0:
+        return files[0]
+    else:
+        return None
+
+def createFolder(service, folderName, folderId_root):
+    file_metadata = {
+        'name': folderName,
+        'mimeType': 'application/vnd.google-apps.folder',
+        'parents': [folderId_root]
+    }
+    file = service.files().create(body=file_metadata, fields='id').execute()
+
+    id = file.get('id')
+
+    return id
+
+def createFile(service, folderName, fileName, mimeType, folderId_parent):
+    filePath = folderName + "/" + fileName
     fileMetaData = {
         'name': fileName,
-        'mimeType': mimeType
+        'mimeType': mimeType,
+        'parents': [folderId_parent]
     }
-    media = MediaFileUpload(filePath,
+    file = MediaFileUpload(filePath,
                             mimetype=mimeType,
                             resumable=True)
-    request = service.files().create(body=fileMetaData, media_body=media, fields='id').execute()
+    request = service.files().create(body=fileMetaData, media_body=file, fields='id').execute()
 
     print ("File ID: [%s]" % request.get("id"))
-    print ("uploadFile [%s] done" % fileName)
-    
+    print ("uploadFile [%s] done" % filePath)

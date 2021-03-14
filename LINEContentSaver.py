@@ -18,8 +18,6 @@ def main():
     port = int(os.environ.get('PORT', 80))
     app.run(host='0.0.0.0', port=port)
 
-
-
 @app.route("/callback", methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']

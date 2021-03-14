@@ -1,6 +1,6 @@
 from linebot import LineBotApi
 import FilePathGetter
-import CloudFileSaver
+import CloudFileProcessor
 
 def save(message):
     print("got message")
@@ -33,4 +33,4 @@ def getFilePath(message):
     return filePath
 
 def saveToCloud(localFilePath):
-    CloudFileSaver.save(localFilePath)
+    CloudFileProcessor.save(localFilePath)
