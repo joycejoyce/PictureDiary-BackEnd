@@ -66,11 +66,11 @@ def uploadFile(service, localFilePath, mimeType):
     print("folderName: [%s]" % folderName)
 
     folderId_Date = getFileId(service, folderName, folderId_root)
-    print("folderId_Date: [%s] (existed)" % folderId_Date)
+    print("folderId_Date (existed): [%s]" % folderId_Date)
 
     if not folderId_Date:
         folderId_Date = createFolder(service, folderName, folderId_root)        
-        print ("folderId_Date: [%s] (new-created)" % folderId_Date)
+        print ("folderId_Date (new-created): [%s]" % folderId_Date)
 
     fileName = FilePathProcessor.getFileName(localFilePath)
     print("fileName: [%s]" % fileName)
@@ -86,7 +86,7 @@ def getFileId(service, folderName, folderId_root):
                                     pageToken=page_token).execute()
     files = response.get('files')
     if len(files) > 0:
-        return files[0]
+        return files[0].get('id')
     else:
         return None
 
