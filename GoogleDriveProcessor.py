@@ -11,8 +11,9 @@ def getService():
     creds = getCreds()
     
     global service
-    service = build('drive', 'v3', credentials=creds)
-    
+    if service is None:
+        service = build('drive', 'v3', credentials=creds)
+
     return service
 
 def getCreds():
@@ -56,6 +57,7 @@ def getInfoAry_filesInFolder(mimeType, parentFolderId, fieldName_id, fieldName_n
     print("parentFolderId", parentFolderId)
     queryStr = "mimeType='%s' and parents in '%s'" % (mimeType, parentFolderId)
 
+    service = getService()
     response = service.files().list(q = queryStr,
                                 spaces = "drive",
                                 fields = "files(id, name)").execute()
@@ -86,3 +88,7 @@ def getInfoAry_filesInFolder(mimeType, parentFolderId, fieldName_id, fieldName_n
             resultJson.append(obj)
 
     return resultJson
+
+def getFileContent(fileId):
+    service = getService()
+    return service.files().get_media(fileId = fileId).execute()

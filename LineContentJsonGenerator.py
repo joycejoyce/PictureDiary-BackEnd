@@ -4,18 +4,13 @@ import codecs
 import ntpath
 import os
 import io
-from GoogleDriveProcessor import getService, getInfoAry_filesInFolder
+from GoogleDriveProcessor import getService, getInfoAry_filesInFolder, getFileContent
 from googleapiclient import errors
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
-from GlobalVar import LineContentFolderId, AllJsonFileName
+from GlobalVar import LineContentFolderId, AllJsonFileName, MimeType
 
 service = None
 isTest = False
-MimeType = {
-    "Folder": "application/vnd.google-apps.folder",
-    "Text": "text/plain",
-    "Img": "image/jpeg"
-}
 JsonFieldNames = [
     "dateId",
     "date",
@@ -151,9 +146,6 @@ def getInfo_textFile(folderId):
         }
 
         return obj
-
-def getFileContent(fileId):
-    return service.files().get_media(fileId = fileId).execute()
 
 def getEncoding(binary):
     return chardet.detect(binary)["encoding"]

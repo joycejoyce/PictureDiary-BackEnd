@@ -41,7 +41,8 @@ def genAllJson():
 
 @app.route("/getAllJson")
 def getAllJson():
-    LineContentJsonGetter.get()
+    json = LineContentJsonGetter.get()
+    return json
 
 if __name__ == '__main__':
     main()
