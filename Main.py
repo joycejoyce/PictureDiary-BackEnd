@@ -9,6 +9,7 @@ from linebot.models import *
 import FilePathGetter
 import LineContentSaver
 import LineContentJsonGenerator
+import LineContentJsonGetter
 from GlobalVar import RetMsg_OK
 
 app = Flask(__name__)
@@ -37,6 +38,10 @@ def handle_message(event):
 def genAllJson():
     LineContentJsonGenerator.gen()
     return RetMsg_OK
+
+@app.route("/getAllJson")
+def getAllJson():
+    LineContentJsonGetter.get()
 
 if __name__ == '__main__':
     main()

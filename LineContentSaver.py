@@ -2,10 +2,15 @@ from linebot import LineBotApi
 import FilePathGetter
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import FilePathProcessor
-import GoogleDriveApiServiceGetter
+from GoogleDriveProcessor import getService
 from GlobalVar import LineContentFolderId
 
+service = None
+
 def save(message):
+    global service
+    service = getService()
+    
     msgType = message.type
     localFilePath = getFilePath(message)
     saveToLocal(message, localFilePath, msgType)
@@ -53,7 +58,6 @@ def getMimeType(localFilePath):
     return mimeType
 
 def saveToCloud(localFilePath):
-    service = GoogleDriveApiServiceGetter.get()
     mimeType = getMimeType(localFilePath)
     uploadFile(service, localFilePath, mimeType)
 

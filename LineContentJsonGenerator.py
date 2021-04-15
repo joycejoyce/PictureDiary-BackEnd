@@ -4,13 +4,13 @@ import codecs
 import ntpath
 import os
 import io
-import GoogleDriveApiServiceGetter
+from GoogleDriveProcessor import getService, getInfoAry_filesInFolder
 from googleapiclient import errors
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
-from GlobalVar import LineContentFolderId
+from GlobalVar import LineContentFolderId, AllJsonFileName
 
+service = None
 isTest = False
-service = GoogleDriveApiServiceGetter.get()
 MimeType = {
     "Folder": "application/vnd.google-apps.folder",
     "Text": "text/plain",
@@ -23,9 +23,12 @@ JsonFieldNames = [
     "title",
     "text"
 ]
-outputFileName = "All.txt"
+outputFileName = AllJsonFileName
 
 def gen():
+    global service
+    service = getService()
+
     rootFolderId = getRootFolderId()
 
     infoAry_dateFolder = getInfoAry_dateFolder(rootFolderId) # JSON array of: id_dateFolder / date
@@ -59,54 +62,6 @@ def getInfoAry_dateFolder(parentFolderId):
     infoAry_dateFolder = getInfoAry_filesInFolder(MimeType.get("Folder"), parentFolderId, "id_dateFolder", "date", includeFoldersOfNoSubFolder)
     
     return infoAry_dateFolder
-
-### getInfoAry_filesInFolder() ###
-# output:
-# [
-#     {
-#         "id": "0001",
-#         "name": "test1"
-#     },
-#     {
-#         "id": "0002",
-#         "name": "test2"
-#     }
-# ]
-###
-def getInfoAry_filesInFolder(mimeType, parentFolderId, fieldName_id, fieldName_name, includeFoldersOfNoSubFolder):
-    print("parentFolderId", parentFolderId)
-    queryStr = "mimeType='%s' and parents in '%s'" % (mimeType, parentFolderId)
-
-    response = service.files().list(q = queryStr,
-                                spaces = "drive",
-                                fields = "files(id, name)").execute()
-
-    files = response.get("files")
-
-    resultJson = json.loads("[]")
-
-    if len(files) == 0:
-        msg = "No files found for parentFolderId: " + parentFolderId
-        print(msg)
-        if includeFoldersOfNoSubFolder:
-            obj = {
-                "parentFolderId": parentFolderId,
-                "msg": msg
-            }
-            resultJson.append(obj)
-    else:
-        for file in files:
-            id = file.get("id")
-            name = file.get("name")
-
-            obj = {
-                fieldName_id: id,
-                fieldName_name: name
-            }
-
-            resultJson.append(obj)
-
-    return resultJson
 
 def getInfoAry_titleFolder(infoAry_dateFolder):
     resultJson = json.loads("[]")
