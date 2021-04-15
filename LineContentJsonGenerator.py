@@ -9,7 +9,7 @@ from googleapiclient import errors
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from GlobalVar import LineContentFolderId
 
-isTest = True
+isTest = False
 service = GoogleDriveApiServiceGetter.get()
 MimeType = {
     "Folder": "application/vnd.google-apps.folder",
