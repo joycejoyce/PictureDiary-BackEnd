@@ -1,1 +1,1 @@
-web: python3 LineContentProcessor.py
+web: python3 Main.py
