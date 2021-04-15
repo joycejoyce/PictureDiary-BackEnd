@@ -1,39 +1,35 @@
-from __future__ import print_function
-import os.path
-import requests
-import json # added
-from flask import Flask, request, abort
-from linebot import (
-    LineBotApi, WebhookHandler
-)
-from linebot.exceptions import (
-    InvalidSignatureError
-)
-from linebot.models import *
+from linebot import LineBotApi
 import FilePathGetter
-import FileSaver
+import CloudFileProcessor
 
-app = Flask(__name__)
-def main():
-    port = int(os.environ.get('PORT', 80))
-    app.run(host='0.0.0.0', port=port)
+def save(message):
+    msgType = message.type
+    localFilePath = getFilePath(message)
+    saveToLocal(message, localFilePath, msgType)
+    saveToCloud(localFilePath)
+    
+line_bot_api = LineBotApi('dzuf4ok7JghxVZh1Ua+V2vYDUmGnQXW/L5v5yivAzCNae2STLMjhonxgdt/rDh6DKgtPuc/yRFVfzgqrcZPJc3vCQxoQC8TzQWBX0mBdtixudw50CiM7k4kJaYcMq442zV6Sx/WE+cjbzoD0hreLcwdB04t89/1O/w1cDnyilFU=')
+def saveToLocal(message, filePath, msgType):
+    if msgType == "text":
+        message_text = message.text
+        fd = open(filePath, "a")
+        fd.write(message_text)
+    elif msgType == "image":
+        message_content = line_bot_api.get_message_content(message.id)
+        with open(filePath, 'wb') as fd:
+            for chunk in message_content.iter_content():
+                fd.write(chunk)
+    elif msgType == "video":
+        message_content = line_bot_api.get_message_content(message.id)
+        with open(filePath, 'wb') as fd:
+            for chunk in message_content.iter_content():
+                fd.write(chunk)
+                
+    print("saveToLocal [%s] done" % filePath)
 
-@app.route("/callback", methods=['POST'])
-def callback():
-    signature = request.headers['X-Line-Signature']
-    body = request.get_data(as_text=True)
-    app.logger.info("Request body: [%s]" % body)
-    print(body)
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
-    return 'OK'
+def getFilePath(message):
+    filePath = FilePathGetter.get(message)
+    return filePath
 
-handler = WebhookHandler('2e7ee14868554f9804bc8ef5b0073a41')
-@handler.add(MessageEvent)
-def handle_message(event):
-    FileSaver.save(event.message)
-
-if __name__ == '__main__':
-    main()
+def saveToCloud(localFilePath):
+    CloudFileProcessor.save(localFilePath)
