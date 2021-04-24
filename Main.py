@@ -3,6 +3,7 @@ import os.path
 import requests
 import json # added
 from flask import Flask, request, abort
+from flask_cors import CORS
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
@@ -13,6 +14,7 @@ import LineContentJsonGetter
 from GlobalVar import RetMsg_OK
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 def main():
     port = int(os.environ.get('PORT', 80))
     app.run(host='0.0.0.0', port=port)
