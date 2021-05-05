@@ -11,6 +11,7 @@ import FilePathGetter
 import LineContentSaver
 import LineContentJsonGenerator
 import LineContentJsonGetter
+import NDaysDataGetter
 from GlobalVar import RetMsg_OK
 
 app = Flask(__name__)
@@ -44,6 +45,11 @@ def genAllJson():
 @app.route("/getAllJson")
 def getAllJson():
     json = LineContentJsonGetter.get()
+    return json
+
+@app.route("/getJsonForNDays/<dayNum>/<lastDate>")
+def getJsonForNDays(dayNum, lastDate):
+    json = NDaysDataGetter.get(dayNum, lastDate)
     return json
 
 if __name__ == '__main__':

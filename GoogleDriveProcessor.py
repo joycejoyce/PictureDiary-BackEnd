@@ -1,6 +1,7 @@
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+import MsgGenerator
 import pickle
 import os
 import json
@@ -67,7 +68,7 @@ def getInfoAry_filesInFolder(mimeType, parentFolderId, fieldName_id, fieldName_n
     resultJson = json.loads("[]")
 
     if len(files) == 0:
-        msg = "No files found for parentFolderId: " + parentFolderId
+        msg = MsgGenerator.gen_NoFileFound(parentFolderId)
         print(msg)
         if includeFoldersOfNoSubFolder:
             obj = {
