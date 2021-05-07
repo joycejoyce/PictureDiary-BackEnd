@@ -8,13 +8,17 @@ from GlobalVar import LineContentFolderId
 service = None
 
 def save(message):
-    global service
-    service = getService()
-    
-    msgType = message.type
-    localFilePath = getFilePath(message)
-    saveToLocal(message, localFilePath, msgType)
-    saveToCloud(localFilePath)
+    try:
+        global service
+        service = getService()
+        
+        msgType = message.type
+        localFilePath = getFilePath(message)
+        saveToLocal(message, localFilePath, msgType)
+        saveToCloud(localFilePath)
+    except Exception as e:
+        print("Exception occurred")
+        print(e)
     
 line_bot_api = LineBotApi('dzuf4ok7JghxVZh1Ua+V2vYDUmGnQXW/L5v5yivAzCNae2STLMjhonxgdt/rDh6DKgtPuc/yRFVfzgqrcZPJc3vCQxoQC8TzQWBX0mBdtixudw50CiM7k4kJaYcMq442zV6Sx/WE+cjbzoD0hreLcwdB04t89/1O/w1cDnyilFU=')
 def saveToLocal(message, filePath, msgType):
@@ -67,17 +71,22 @@ def uploadFile(service, localFilePath, mimeType):
     folderName = FilePathProcessor.getFolderName(localFilePath)
     print("folderName: [%s]" % folderName)
 
-    folderId_Date = getFileId(service, folderName, folderId_root)
-    print("folderId_Date (existed): [%s]" % folderId_Date)
+    folderId_Date = getTempFolderId()
 
-    if not folderId_Date:
-        folderId_Date = createFolder(service, folderName, folderId_root)        
-        print ("folderId_Date (new-created): [%s]" % folderId_Date)
+    # folderId_Date = getFileId(service, folderName, folderId_root)
+    # if folderId_Date:
+    #     print("folderId_Date (existed): [%s]" % folderId_Date)
+    # else:
+    #     folderId_Date = createFolder(service, folderName, folderId_root)        
+    #     print("folderId_Date (new-created): [%s]" % folderId_Date)
 
     fileName = FilePathProcessor.getFileName(localFilePath)
     print("fileName: [%s]" % fileName)
 
     createFile(service, folderName, fileName, mimeType, folderId_Date)
+
+def getTempFolderId():
+    return "1vMC8QmzGmxeEZC5fMZR_FSUsaIyEeKv2"
 
 def getFileId(service, folderName, folderId_root):
     queryStr = "mimeType='application/vnd.google-apps.folder' and name='%s' and parents in '%s'" % (folderName, folderId_root)

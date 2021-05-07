@@ -24,8 +24,7 @@ def main():
 def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: [%s]" % body)
-    print(body)
+    print("Request body: [%s]" % body)
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
