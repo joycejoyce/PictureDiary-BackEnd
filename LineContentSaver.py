@@ -66,6 +66,8 @@ def saveToCloud(localFilePath):
     uploadFile(service, localFilePath, mimeType)
 
 def uploadFile(service, localFilePath, mimeType):
+    print("Enter uploadFile()")
+
     folderId_root = LineContentFolderId
 
     folderName = FilePathProcessor.getFolderName(localFilePath)
